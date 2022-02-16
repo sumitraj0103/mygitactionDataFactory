@@ -1,4 +1,4 @@
-name: ADF-CI-CD
+name: ADF-CI-CD-Monoline
 
 # Manual trigger with parameters
 on:

@@ -1,109 +1,38 @@
 # Azure-Data-Factory-CI-CD-Source-Control
-Lots of people have asked how to have many feature branches with Azure Data Factory and there are challenges with the single ADF Publish branch Data Factory utilizes.  By default ADF uses the GitHub Flow for branching, but most of my customers want Git Flow for branching (feature branches with different deployments).  See this [link](https://lucamezzalira.com/2014/03/10/git-flow-vs-github-flow/ "(link)") for Git Flow versus GitHub Flow. 
-
-[![Actions Status](https://github.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/workflows/ADF-CI-CD/badge.svg)](https://github.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/actions)
+We are Going to use GITHUB Enterprise with Dev --> PrePro --> Prod Branche.
 
 ## ADF's Apporach to Source Control
-ADF generates ARM templates in order to deploy your pipelines.  There is only one ADF Publish branch which causes issues if you are wanting different features during development.  Each feature needs to be tested/deployed seperately before merging to the collaboration branch where you typically publish.  Plus, most organizations think they will be deploying Feature A before Feature B, but priorities sometimes change. External forces can cause Feature B to be scheduled for release before Feature A.
+ADF generates ARM templates in order to deploy pipelines.  There is only one ADF Publish branch which causes issues if you are wanting different features during development.  Each feature needs to be tested/deployed seperately before merging to the collaboration branch where you typically publish. 
 
-![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/CurrentIssue.png "Current Issue")
-
-Note: When viewing screenshots it is best to right click on open in new tab.
 
 ## How to use Source Control with your own Branching
-- We will be creating a single Git Repo that will be shared by several different ADFs (all for the same set of pipelines).  Each ADF will treat their branch as their collaboration branch which will create different folders under the adf_publish branch.  Only the development braches will be linked to source control and the QA/Prod deployments will not be linked.
-
-![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/ADFSourceControl.png "ADF Source Control")
+- We will be creating a single Git Repo that will be shared by several different ADFs (all for the same set of pipelines).  Each ADF will treat their branch as their collaboration branch which will create different folders under the adf_publish branch.  Only the development braches will be linked to source control and the PrProd/Prod deployments will not be linked.
 
 
-## Create a Master project
-1. In Azure create a resource group: ADF-Dev-Ops
-2. Create a Data Factory: ADF-MyADFProject-Master 
-   - [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Create-ADF-MyADFProject-Master.png "screenshot")
-   - This will be our master data factory that will be used to Publish our Production data factory ARM templates.
-   - Developers will never code here
-   - You will replace ADF-MyADFProject with your real project name.  Keep the "-Master" suffix to you can keep track of your resources.
-2. Create a Azure Dev Ops or GitHub project: MyADFProject
-3. Open the ADF (UI): ADF-MyADFProject-Master 
-4. Click on the link to source control [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Link-To-Source-Control.png "screenshot")
+## Create a Dev project
+1. In Azure create a resource group: datafactory-monoline-dev
+2. Create a Data Factory: ADF-monoline-dev
+   - This will be our dev data factory that will be used to Publish our Pre Production and Production data factory ARM templates.
+   - Developers can code here after the GIT Integration.
+   
+3. Open the ADF (UI): ADF-monoline-dev
+4. Set below
    - Configure
-       - Set the Collaboration branch to **Master** [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Link-ADF-Master-To-Git.png "Link-ADF-Master-To-Git")
+       - Set the Collaboration branch to **Master** [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Link-ADF-Master-To-Git.png "Link-ADF-Dev-To-Git")
        - You only need the Import button check if you are doing this for an existing ADF
-5. Download these three files
-   - [Create-ADF-Parameters.json](./ARM-Templates/Create-ADF-Parameters.json "Create-ADF-Parameters.json") 
-   - [Create-ADF-Template.json](.ARM-Templates/Create-ADF-Template.json "Create-ADF-Template.json") 
-   - [Deploy-ADF.ps1](./PowerShell-Scripts/Deploy-ADF.ps1 "Deploy-ADF.ps1") 
+5. Download the file
       - The latest script is here: https://docs.microsoft.com/en-us/azure/data-factory/continuous-integration-deployment#script
 6. In your Git repo
    - Place the JSON in an "ARM-Templates" folder
    - Place the PS1 in a "PowerShell-Scripts" folder
-7. Download the Azure Dev Ops Pipeline file that will do our deployment
-   - [azure-pipelines.yml](./azure-pipelines.yml "azure-pipelines.yml") 
-8. In your Git Repo
-   - Upload azure-pipelines.yml to the root (not in a folder)
-- Summary
-   -  We have created the master branch, linked to source control, have uploaded 3 files which will be used for our deployments and now have a dev ops pipeline.  The 3 support files contains the ARM template to create a new ADF resource in Azure and an ADF PowerShell deployment script.
 
-
-## Create a Feature-A Branch
-1. In source control create a new branch from master called: Feature-A [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Create-Feature-Branch-A.png "Create-Feature-Branch-A")
-2. Create a Data Factory: ADF-MyADFProject-Feature-A
-   - [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Create-ADF-MyADFProject-Feature-A.png "screenshot")
-   - This will be used for coding our data factory
-4. Click on the link to source control
-   - [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Link-To-Source-Control.png "screenshot")
-   - Configure
-       - Set the Collaboration branch to **Feature-A**
-       - [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Link-ADF-Feature-A-To-Git.png "Link-ADF-Feature-A-To-Git")
-       - Note: You do not need to import resources since there are none at this point.  The only resources should be from master.
-4. Click on the pencil icon to create a pipeline
-5. Select Feature-A as your working branch [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Select-Feature-A-Branch.png "Select-Feature-A-Branch")
-6. Create a pipeline named "feature-a-test-pipeline"
-7. Add a Wait activity.  This is just a test pipeline.
-8. Click Save All 
-9. Go into source control under branch "Feature-A" and you should see your code [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Feature-A-Code.png "Feature-A-Code")
-10. In ADF click the "Publish" button [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/Publish-Feature-A.png "Publish-Feature-A")
-11. Go into source control under branch "adf_publish" and you will see your genereated ARM templates under a folder call "ADF-MyADFProject-Feature-A" [Click for Screenshot](https://raw.githubusercontent.com/AdamPaternostro/Azure-Data-Factory-CI-CD-Source-Control/master/images/ADF-Publish-Source-Control-Feature-A.png "ADF-Publish-Source-Control-Feature-A")
-- Summary
-   -  We have created a development Feature A environment.  This is where we will develop our data factory pipelines.
-
-
-## Create a Feature-B Branch
-- You may create a Feature-B branch by doing the same steps are above.  This is optional for now.
-
-
-## Decision for QA Environment
-- We now want to deploy to QA
-- We could have single QA environment (e.g. ADF-MyADFProject-**QA**) or we could have a QA environment (ADF-MyADFProject-Feature-A-**QA**)
-- The single QA environment means we only have one place to test our features in UAT/QA
-- The QA environment per Feature means we can have as many as we want for testing purposes
-- At this point in time we many not know if feature-a or feature-b will be released first to production
-- A possible issue with having a mulitple feature QA environments might be conflicts.  Pipeline-1 in feature A and B might run at the 8 PM and could collide.  Or if you have triggers you might run into collisions.
-   - I **never** use ADF triggers for blobs.  You can read why here on slide 6 in the Azure-Big-Data-Architecture.pptx PowerPoint here: https://github.com/AdamPaternostro/Azure-Big-Data-and-Machine-Learning-Architecture 
-- Personally, I prefer multiple QA environments to keep things easy to test and take advantage of the cloud's abilty for me to create the resources I require.
-
-
-## Deploy Feature A branch to QA
-- Update Feature A branch with any changes (or hotfixes) from Master (Prod)
+## Deploy Dev to PreProd
+- Update PreProd with Dev Branch 
 - We will merge Master back into our Feature-A branch in case any changes in Master has occurred
     One time commands to clone your repo
-    ```
-    cd \
-    git clone git@ssh.dev.azure.com:v3/paternostromicrosoft/MyADFProject/MyADFProject
-    ```
-    Subsequent times
-    ```
-    cd MyADFProject
-    git checkout master
-    git pull
-    git checkout Feature-A
-    git pull
-    git merge master
-    git push
-    ```
+    
 - Manually publish the ADF
-  - In the Data Factory UI for ADF-MyADFProject-Feature-A click on the Publish button (just as you did before).  You can skip this step if nothing was merged from Master    
-
+  
 
 ## To Deploy to QA
 - Open your Azure Dev Ops Project
