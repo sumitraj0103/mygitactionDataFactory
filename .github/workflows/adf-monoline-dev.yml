@@ -14,7 +14,7 @@ on:
       ADF_PUBLISH_FOLDER:
         description: 'ADF Publish Folder Name in Git (under adf_publish branch)'
         required: true
-        default: 'datafactory-monoline-dev-poc'
+        default: 'datafactory-monoline-dev-poc2'
 
       # This resource group for the ADF
       RESOURCE_GROUP:
@@ -40,8 +40,6 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
-      with: 
-       ref: Dev
 
     # Show paths
     - name: Show paths
@@ -69,10 +67,10 @@ jobs:
         name: 'PowerShell-Scripts'
         path: '${{ github.workspace }}/PowerShell-Scripts'
 
-    - name: Checkout adf_publish branch
-      uses: actions/checkout@v2
-      with:
-        ref: adf_publish
+    #- name: Checkout adf_publish branch
+      #uses: actions/checkout@v2
+      #with:
+        #ref: adf_publish
 
     # Show paths
     - name: Show paths
