@@ -1,0 +1,9 @@
+{
+	"name": "datafactory-monoline-dev-poc",
+	"location": "southeastasia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "06d19e49-3836-4750-880a-c599b61d6caf",
+		"tenantId": "5cfb3473-12f5-4b3e-a74f-bc849b61ba8c"
+	}
+}
