@@ -8,7 +8,7 @@ on:
       ADF_NAME:
         description: 'ADF Name to Deploy'
         required: true
-        default: 'ADF-Monoline-Dev'
+        default: 'datafactory-monoline-dev-poc'
 
       # Name of the publish folder under adf_publish bnrach
       ADF_PUBLISH_FOLDER:
